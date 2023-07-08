@@ -1,0 +1,301 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather </title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+  <script src="https://code.highcharts.com/modules/heatmap.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  <header>
+        <nav class="navbar navbar-expand-lg bg-dark border-bottom border-bottom-dark">
+            <div class="container-fluid">
+              <h1 style="color:white;">weather Website</h1>
+              
+            
+            </div>
+          </nav>
+        </header>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 10px;
+      background-image: "";
+      background-color: yellowgreen;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    div {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+
+    #heatmapContainer,
+    #raceBarContainer,
+    #chart3DContainer,
+    #strokeChartContainer {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 20px;
+      padding: 40px 60px ;
+    }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+
+
+
+  </style>
+</head>
+<body >
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+  
+  
+    <form class="d-flex" role="search"  style="margin-left: 500px;">
+          
+      <input class="form-control me-2" id="countryInput" type="search" placeholder="Enter country name" aria-label="Search">
+      <button class="btn text-dark"   id="searchButton" type="button"><i class="bi bi-search">search</i></button>
+      
+    </form>
+    
+  <div id="heatmapContainer"></div>
+  <div id="raceBarContainer"></div>
+  <div id="chart3DContainer"></div>
+  <div id="strokeChartContainer"></div>
+  <table id="weatherTable">
+    <thead>+
+      <tr>
+        <th>Country</th>
+        <th>Temperature (°C)</th>
+        <th>Humidity (%)</th>
+        <th>Pressure (hPa)</th>
+        <th>Wind Speed (m/s)</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <script>
+    const apiKey = "f33171a29dd2c60ca7f935b26924e9cc";
+    const baseUrl = "https://api.openweathermap.org/data/2.5";
+    const endpoint = "/weather";
+
+    
+    const raceBarOptions = {
+      chart: {
+        type: "bar"
+      },
+      title: {
+        text: "Weather Information (Race Bar Chart)"
+      },
+      xAxis: {
+        categories: []
+      },
+      yAxis: {
+        title: {
+          text: "Value"
+        }
+      },
+      series: [{
+        name: "Temperature",
+        data: []
+      }],
+    };
+
+    const heatmapOptions = {
+      chart: {
+        type: "heatmap",
+        marginTop: 40,
+        marginBottom: 80,
+        plotBorderWidth: 1
+      },
+      title: {
+        text: "Current Weather Measurement Heatmap"
+      },
+      xAxis: {
+        categories: ["Temperature", "Humidity", "Pressure", "Wind Speed"]
+      },
+      yAxis: {
+        categories: ["Measurement"],
+        title: null
+      },
+      colorAxis: {
+        min: 0,
+        max: 100,
+        stops: [
+          [0, "#3060cf"],
+          [0.5, "#fffbbc"],
+          [0.9, "#c4463a"],
+          [1, "#c4463a"]
+        ]
+      },
+      series: [{
+        name: "Weather Measurements",
+        borderWidth: 1,
+        data: [],
+        dataLabels: {
+          enabled: true,
+          color: "#000000"
+        }
+      }],
+    };
+
+    const chart3DOptions = {
+      chart: {
+        type: "column",
+        options3d: {
+          enabled: true,
+          alpha: 15,
+          beta: 15,
+          depth: 50,
+          viewDistance: 25
+        }
+      },
+      title: {
+        text: "Weather Information (3D Bar Chart)"
+      },
+      xAxis: {
+        categories: []
+      },
+      yAxis: {
+        title: {
+          text: "Temperature (°C)"
+        }
+      },
+      zAxis: {
+        title: {
+          text: "Value"
+        }
+      },
+      plotOptions: {
+        column: {
+          depth: 25
+        }
+      },
+      series: [{
+        name: "Temperature",
+        data: []
+      }],
+    };
+    const strokeChartOptions = {
+      chart: {
+        type: "line"
+      },
+      title: {
+        text: "Weather Information (Stroke Chart)"
+      },
+      xAxis: {
+        categories: []
+      },
+      yAxis: {
+        title: {
+          text: "Temperature (°C)"
+        }
+      },
+      series: [{
+        name: "Temperature",
+        data: []
+      }],
+    };
+
+    function fetchWeatherData(country) {
+      const apiUrl = `${baseUrl}${endpoint}?q=${country}&units=metric&appid=${apiKey}`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const temperature = data.main.temp;
+          const humidity = data.main.humidity;
+          const pressure = data.main.pressure;
+          const windSpeed = data.wind.speed;
+
+          // Update heatmap data
+          heatmapOptions.series[0].data = [[temperature, 0], [humidity, 1], [pressure, 2], [windSpeed, 3]];
+          Highcharts.chart("heatmapContainer", heatmapOptions);
+
+        
+                    // Update race bar chart data
+                    raceBarOptions.xAxis.categories = [country];
+                    raceBarOptions.series[0].data = [{
+                      y: temperature,
+                      color: {
+                        linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+                        stops: [
+                          [0, "#00bfff"],
+                          [1, "#0000ff"]
+                        ]
+                      }
+                    }];
+                    Highcharts.chart("raceBarContainer", raceBarOptions);
+          
+                    
+                    // Update 3D bar chart data
+                    chart3DOptions.xAxis.categories = [country];
+                    chart3DOptions.series[0].data = [{
+                      y: temperature,
+                      color: {
+                        linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+                        stops: [
+                          [0, "#00bfff"],
+                          [1, "#0000ff"]
+                        ]
+                      }
+                    }];
+                    Highcharts.chart("chart3DContainer", chart3DOptions);
+          
+                    // Update stroke chart data
+                    strokeChartOptions.xAxis.categories = [country];
+                    strokeChartOptions.series[0].data = [temperature];
+                    Highcharts.chart("strokeChartContainer", strokeChartOptions);
+          
+                    console.log (`Temperature in ${country}: ${temperature}°C`);
+                    console.log(`Humidity in ${country}: ${humidity}%`);
+                    console.log(`Pressure in ${country}: ${pressure} hPa`);
+                    console.log(`Wind Speed in ${country}: ${windSpeed} m/s`);
+                  })
+                  .catch(error => console.log(error));
+              }
+          
+          
+          
+              const searchButton = document.getElementById("searchButton");
+              searchButton.addEventListener("click", function() {
+                const countryInput = document.getElementById("countryInput");
+                const country = countryInput.value;
+                fetchWeatherData(country);
+              });
+            </script>
+          </body>
+          </html>
